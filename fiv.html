@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Bootstrap Example</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+		<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<div class="center" style="margin:20px;"><img style="width:500px;height:121px" src="http://s18.postimg.org/5xu6rvbah/logo_1779849_print.jpg">
+			</div>
+			<h2></h2>
+
+			<div class="col-md-4" id="home">
+
+				<p>
+					Thanks for purchasing a Zero Harm 365™ diagnostic assessment.  The outcome of this assessment will allow you to make good business decisions regarding health and safety and ensure your enterprise remains compliant at all times.
+				</p>
+				<br/>
+				<div>
+					<button class="btn-success initiate">
+						Click here to begin
+					</button>
+				</div>
+			</div>
+
+			<div class="form-horizontal" id="results" style="display: none;">
+				<legend>
+					Congratulations on completing your Zero Harm 365 diagnostic!
+				</legend>
+
+				<div class="form-group">
+					<label class="col-md-2 control-label"></label>
+					<div class="col-md-2">Your enterprise is currently rated: <span class="final_number"></span></div>
+				</div>
+			</div>
+
+			<div class="form-horizontal" id="details" style="display: none;">
+				<fieldset>
+
+					<!-- Form Name -->
+					<legend>
+						Client Information
+					</legend>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="company">Company Name</label>
+						<div class="col-md-4">
+							<input id="company" name="company" type="text" placeholder="Example Inc." class="form-control input-md">
+
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="address">Address</label>
+						<div class="col-md-4">
+							<input id="address" name="address" type="text" placeholder="12 Wall St." class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Text input-->
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="wesbite">Website</label>
+						<div class="col-md-4">
+							<input id="wesbite" name="wesbite" type="text" placeholder="www.example.com" class="form-control input-md">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="person">contact person</label>
+						<div class="col-md-4">
+							<input id="person" name="person" type="text" placeholder="John Doe" class="form-control input-md">
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="position">Position</label>
+						<div class="col-md-4">
+							<input id="position" name="position" type="text" placeholder="CXO" class="form-control input-md">
+						</div>
+					</div>
+
+					<!-- Prepended text-->
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="email">Email</label>
+						<div class="col-md-8">
+							<div class="input-group">
+								<input id="email" name="email" class="form-control" placeholder="john@doe.com" type="email">
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="phone">Phone Numner</label>
+						<div class="col-md-4">
+							<input id="phone" name="phone" type="number" placeholder="CXO" class="form-control input-md">
+						</div>
+					</div>
+					<div class="form-group">
+						<div class="col-md-4 control-label">
+							<div class="col-md-4">
+								<button class="btn-primary btn-default detail_submit center" style="margin-left: 100px;">
+									Continue
+								</button>
+							</div>
+						</div>
+					</div>
+
+				</fieldset>
+			</div>
+		</div>
+	</body>
+</html>
+
+<script type="text/javascript">
+	$('.initiate').click(function() {
+		$('#home').remove();
+		$('#details').show();
+	});
+
+	$('.detail_submit').click(function(e) {
+		var details = {};
+		details['company'] = $('#company').val();
+		details['address'] = $('#address').val();
+		details['website'] = $('#website').val();
+		details['person'] = $('#person').val();
+		details['position'] = $('#position').val();
+		details['email'] = $('#email').val();
+		details['phone'] = $('#phone').val();
+
+		localStorage.setItem('details', JSON.stringify(details));
+		$('#details').remove();
+		buildForm();
+	});
+
+	$(document).on('click', '.section_submit', function() {
+		if (VerifyStateCompletion()) {
+			$('.sec').remove();
+			buildForm();
+		}
+
+	});
+	
+	$(document).on('click', '.final_submit', function() {
+		if (VerifyStateCompletion()) {
+			$('.sec').remove();
+			ShowResults();
+		}
+
+	});
+
+	var sections = ['GK', 'MR', 'MK', 'OK', 'HSS', 'EHR', 'EE', 'V', 'EP', 'RSC'];
+	var sections_header = ['Governance Knowledge', 'Management to Board Reporting', 'Management Knowledge', 'Operational Team Knowledge', 'Health and Safety System (Aligns to ISO31000)', ' Employee Hazard and Risk Reporting', 'Employee Engagement', 'Verification to Health & Safety at Work Act (2015) & ISO31000', 'Emergency preparedness', 'Risk & Safety Culture'];
+	var weightage = [5, 10, 10, 5, 20, 5, 10, 15, 5, 15];
+	var sub_sections = {};
+	sub_sections[sections[0]] = {};
+	sub_sections[sections[1]] = {};
+	sub_sections[sections[2]] = {};
+	sub_sections[sections[3]] = {};
+	sub_sections[sections[4]] = {};
+	sub_sections[sections[5]] = {};
+	sub_sections[sections[6]] = {};
+	sub_sections[sections[7]] = {};
+	sub_sections[sections[8]] = {};
+	sub_sections[sections[9]] = {};
+	sub_sections[sections[0]]["heading"] = ["All directors receive an induction on the company health and safety system", "The Board has risk management expertise in its composition", "Health and safety is a standing agenda item at each board meeting", "The Board takes independent advice on the quality of its health and safety program", "All directors have an understanding of the ISO31000 risk management framework", "All directors have an understanding of their Duties under the Health and Safety at Work Act (2015)", "All directors have an understanding of specifc industry health and safety requirements for their enterprise", "The Board has a health and safety sub-committee (or risk committee) that provides the Board with more indepth analysis and discussion regarding health and safety matters"];
+	sub_sections[sections[0]]["weight"] = [10, 20, 15, 10, 10, 15, 10, 10];
+
+	sub_sections[sections[1]]["heading"] = ["Health and safety incidents are reported to the Board", "Near miss incidents are reported to the Board", "The Board recieves regular information from management regarding development of its health and safety operations", "The Board recieves notification where there is a compliance breach of internal health and safety policies", "The Board recieves notification where there is a regulatory compliance breach", "Management's actions to mitigate known risks to health and safety are reported to the Board", "The Board are informed about the level of employee engagement on health and safety matters"];
+	sub_sections[sections[1]]["weight"] = [20, 10, 10, 15, 20, 10, 15];
+
+	sub_sections[sections[2]]["heading"] = ["All managers receive an induction on the company health and safety system", "The management team has risk management expertise in its composition", "Health and safety is a standing agenda item at each management meeting", "Management takes independent advice on the quality of its health and safety program", "Management have an understanding if the ISO31000 risk management framework", "All managers have an understanding of their Duties under the Health and Safety at Work Act (2015)", "All managers have an understanding of specifc industry health and safety requirements for their enterprise", "Management have a good understanding of the effectiveness of controls in place to manage health and safety risks"];
+	sub_sections[sections[2]]["weight"] = [10, 20, 10, 10, 15, 10, 10, 15];
+
+	sub_sections[sections[3]]["heading"] = ["All staff receive an induction on the company health and safety system", "All staff know how to access the company's health and safety system information", "Staff understand how to identify hazards in the workplace", "Staff understand how to report hazards in the workplace", "Staff understand what actions to take when they identify hazards in the workplace", "Health and safety is a standing agenda item at each staff meeting", "Staff undertake regular activities to enhance their health and safety knowledge", "Employees understand what PPE they must wear in the workplace", "All staff have an understanding of their Duties under the Health and Safety at Work Act (2015)", "All staff have an understanding of specifc industry health and safety requirements for their job"];
+	sub_sections[sections[3]]["weight"] = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
+
+	sub_sections[sections[4]]["heading"] = ["The health and safety system clearly describes the overarching objectives of the company", "The health and safety system clearly describes the operations of the company", "The company has a current risk management policy", "The health and safety system describes what risks have been identified in the workplace", "The health and safety system describes the cause / trigger of each risk", "The health and safety system describes who is suseptible to each risk", "The health and safety system assesses the severity of each risk", "The health and safety system assesses the probability / likelihood of each risk event occuring", "The total risk level is recorded for each risk", "The risk level is evaluated against risk tolerances outlined in the company risk policy", "HaThe health and safety system describes who is responsible to managing each riskppy", "The health and safety system describes how each risk will be managed", "The health and safety system describes how the risks will be monitored", "The health and safety system describes when each risk will be formally reviewed", "The health and safety system describes who has / should be consulted about each risk", "The health and safety system describes how risk, health and safety information is communicated within the workplace"];
+	sub_sections[sections[4]]["weight"] = [2.5, 5, 7.5, 10, 5, 5, 10, 10, 10, 7.5, 5, 10, 2.5, 2.5, 5];
+
+	sub_sections[sections[5]]["heading"] = ["Employees know how to report hazards in the workplace", "Employees know how to report hazards in the workplace", "Employees know how to report near miss information in the workplace", "Management know how to treat employee health and safety related reports", "I have confidence in the management team to respond to my concerns about health and safety at work"];
+	sub_sections[sections[5]]["weight"] = [20, 20, 20, 20, 20];
+
+	sub_sections[sections[6]]["heading"] = ["Employees have an opportunity to openly discuss health and safety matters with their managers", "Employees are provided with regular updates on health and safety in the workplace", "Management listen to employee concerns about health and safety", "Employees feel empowered to drive continuous improvement in health and safety", "Health and safety is openly discussed at work across all levels of the business", "Employees feel like part of the solution, not part of the problem when it comes to health and safety"];
+	sub_sections[sections[6]]["weight"] = [15, 20, 25, 20, 10, 10];
+
+	sub_sections[sections[7]]["heading"] = ["There are internal audits completed at least quarterly to check that controls are being implemented as per our risk management plan", "The effectiveness of controls being implemented is regularly evaluated", "There is more than one person involved in identifying and analysing risks at work", "Someone independent (such as a safety or risk consultant) is engaged to check our health and safety system is compliant each year", "Someone independent (such as a safety or risk consultant) is engaged to verify the practices used at work are in accordance with our health and safety documentation", "Someone independent (such as a safety or risk consultant) provides advice to the management team about how risks are managed at our workplace", "The risk management actions listed in our health and safety documentation align to what is actually happening at work"];
+	sub_sections[sections[7]]["weight"] = [15, 10, 15, 15, 15, 15, 15];
+
+	sub_sections[sections[8]]["heading"] = ["We have an emergency / crisis plan that outlines the actions to take in the event of a major safety incident at work", "We undertake emergency scenarios each year to all employees know what to do in a crisis at work", "I feel confident I know my role should a crisis occur at work", "I feel confident management will be able to effectively manage a crisis at work", "I have an understanding of the types of crisis that could occur in my workplace", "We could improve our preparedness for a major crisis at work"];
+	sub_sections[sections[8]]["weight"] = [15, 20, 15, 20, 15, 15]
+
+	sub_sections[sections[9]]["heading"] = ["Employees that role model desirable health and safety practices are recognised", "Employees that do not behave consistent with the accepted health and safety practices are held to account", "Employee health and safety is important to the management of the company", "Employee health and safety is important to all employees in the company", "Employee health and safety is important to the Directors of the company", "The company has a clear set of values describing its commitment to employee health and safety", "Employees feel comfortable reporting health and safety concerns at work", "Employees see health and safety as a burden", "There are adequate resources made available to implement the most important health and safety initiatives at work", "Management see health and safety as an uneccessary cost to the company"];
+	sub_sections[sections[9]]["weight"] = [10, 10, 10, 10, 10, 10, 10, 10, 10, 10];
+
+	var divHTML = '<div class="sec" data-weight="5"><div class="form" role="form"></div></div>';
+
+	var states = sections.length;
+	var state = 1;
+
+	function buildForm() {
+		if (state == states)
+			return null;
+		var index = state - 1;
+		var div = $(divHTML);
+		div.attr("id", sections[index]);
+		div.attr("data-weight", weightage[index]);
+		var form = $(div).find('.form');
+		var sub_sec_length = sub_sections[sections[index]]["heading"].length;
+
+		var legendHTML = '<legend>' + sections_header[index] + ' (' + state + '/' + states + ')</legend>';
+		form.append(legendHTML);
+
+		for (var i = 0; i < sub_sec_length; i++) {
+			var section = $('<p class="sub_sec"><h4>' + sub_sections[sections[index]]['heading'][i] + '</h4></p>');
+			form.append(section);
+			var weight = sub_sections[sections[index]]["weight"][i];
+
+			for (var j = 1; j < 11; j++) {
+				form.append('<label class="radio-inline"><input type="radio" data-weight="' + weight + '" ' + 'name="' + sections[index] + i + 1 + '" value="' + j + '">' + j + '</label><label class="radio-inline">');
+			}
+
+			form.append('<br/><p style="margin-top:30px;margin-bottom:20px;"></p>');
+		}
+		if (state + 1 != states) {
+			var buttonHTML = '<button class="btn-primary section_submit center" style="margin-left: 100px;">Continue</button>';
+		} else {
+			var buttonHTML = '<button class="btn-primary final_submit center" style="margin-left: 100px;">See Results</button>';
+		}
+		form.append(buttonHTML);
+		console.log(div);
+		$('.container').append(div);
+
+	}
+
+	function VerifyStateCompletion() {
+		var index = state - 1;
+		valid = false;
+		var sub_sec_length = sub_sections[sections[index]]["heading"].length;
+		var checked_ones = $("input:checked");
+		if (checked_ones.length == sub_sec_length) {
+			valid = true;
+		}
+		if (valid == true) {
+			StoreResults();
+			state++;
+		} else {
+			alert('Some error. Fill all the fields');
+		}
+		return valid;
+		//valid;
+	}
+
+	function StoreResults() {
+		var index = state - 1;
+		var sub_sec_length = sub_sections[sections[index]]["heading"].length;
+		var checked_ones = $("input:checked");
+		var data = [];
+		for (var i = 0; i < sub_sec_length; i++) {
+			data[i] = {};
+			data[i]["value"] = $(checked_ones).val();
+			data[i]["weightage"] = $(checked_ones).attr('data-weight');
+		}
+		localStorage.setItem(sections[index], JSON.stringify(data));
+		//LocalStorage
+	}
+
+	function ShowResults() {
+			var result = CalculateResult();
+			$('.final_number').append(result);
+			$('#results').show();
+
+	}
+
+	function CalculateResult() {
+		var result = [];
+		var final_result = 0;
+		for (var i =0; i < states ; i++){
+			var sub_sec_length = sub_sections[sections[i]]["heading"].length;
+			var state_result = JSON.parse(localStorage.getItem(sections[i]));
+			var sec_result = 0;
+			for (var j = 0; j < sub_sec_length; j++) {
+				sec_result += parseFloat(state_result[j]["value"])*parseFloat(state_result[j]["weightage"]);
+			}
+			result[i] = sec_result/100;
+			final_result += result*parseFloat(weightage[i]);
+		}
+		return final_result
+	}
+
+</script>
